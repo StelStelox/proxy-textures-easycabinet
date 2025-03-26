@@ -1,0 +1,17 @@
+{
+  "name": "api-easycabinet",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "author": "StelStelox",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "axios": "^1.8.4",
+    "express": "^4.21.2"
+  }
+}
