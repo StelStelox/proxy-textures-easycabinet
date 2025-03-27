@@ -10,11 +10,10 @@ API rest для упрощённого построения путей до ск
     ```
 2. Отредактируйте ``.env``
     ```
-    DATABASE_URL="mysql://root:password@localhost:3306/db" # Адрес базы данных
-
     PORT=3000 # Порт API приложения
+    DATABASE_URL="mysql://root:password@localhost:3306/db" # Адрес базы данных
     S3_BUCKET="easy-cabinet" # Имя хранилища
-    S3_PUBLIC_URL="http://0.0.0.0:9000" # Адрес хранилища
+    S3_PUBLIC_URL="http://0.0.0.0:9000" # Адрес S3 хранилища
     ```
 3. Сгенерируйте prisma схему
     ```
@@ -22,5 +21,5 @@ API rest для упрощённого построения путей до ск
     ```
 4. Запустите
     ```
-    node index.js
+    npm run start
     ```

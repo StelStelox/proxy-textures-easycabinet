@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
-import axios from 'axios';
 const app = express();
 const port = process.env.PORT
 
@@ -26,9 +25,9 @@ app.get('/skin/:userName', async (req, res) => {
         };
 
         const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/skin/${skinData.skinHash.substring(0, 2)}/${skinData.skinHash}`;
-        const response = await axios(urlS3, { responseType: 'arraybuffer'});
+        const response = await fetch(urlS3);
         res.set('Content-Type', 'image/png');
-        res.send(response.data);
+        res.send(Buffer.from(await response.arrayBuffer()));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -53,9 +52,9 @@ app.get('/cape/:userName', async (req, res) => {
         };
 
         const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/cape/${capeData.capeHash.substring(0, 2)}/${capeData.capeHash}`;
-        const response = await axios(urlS3, { responseType: 'arraybuffer'});
+        const response = await fetch(urlS3);
         res.set('Content-Type', 'image/png');
-        res.send(response.data);
+        res.send(Buffer.from(await response.arrayBuffer()));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
