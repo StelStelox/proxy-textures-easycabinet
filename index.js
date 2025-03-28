@@ -29,13 +29,13 @@ app.get('/skin/:userName', async (req, res) => {
             const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/skin/${skinData.skinHash.substring(0, 2)}/${skinData.skinHash}`;
             const response = await fetch(urlS3);
             res.set('Content-Type', 'image/png');
-            return res.send(Buffer.from(await response.arrayBuffer()));
+            return res.status(200).send(Buffer.from(await response.arrayBuffer()));
         }
 
         const url = `${process.env.URL_BACKEND_EASY_CABINET}/skin/${skinData.skinHash.substring(0, 2)}/${skinData.skinHash}`
         const response = await fetch(url);
         res.set('Content-Type', 'image/png');
-        res.send(Buffer.from(await response.arrayBuffer()));
+        res.status(200).send(Buffer.from(await response.arrayBuffer()));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -64,13 +64,13 @@ app.get('/cape/:userName', async (req, res) => {
             const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/cape/${capeData.capeHash.substring(0, 2)}/${capeData.capeHash}`;
             const response = await fetch(urlS3);
             res.set('Content-Type', 'image/png');
-            return res.send(Buffer.from(await response.arrayBuffer()));
+            return res.status(200).send(Buffer.from(await response.arrayBuffer()));
         }
 
         const url = `${process.env.URL_BACKEND_EASY_CABINET}/cape/${capeData.capeHash.substring(0, 2)}/${capeData.capeHash}`
         const response = await fetch(url);
         res.set('Content-Type', 'image/png');
-        res.send(Buffer.from(await response.arrayBuffer()));
+        res.status(200).send(Buffer.from(await response.arrayBuffer()));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
