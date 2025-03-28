@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
 const app = express();
+const hostname = process.env.HOSTNAME;
 const port = process.env.PORT
 
 const prisma = new PrismaClient();
@@ -24,8 +25,15 @@ app.get('/skin/:userName', async (req, res) => {
             return res.send(Buffer.from(defaultSkin.split(',')[1], 'base64'));
         };
 
-        const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/skin/${skinData.skinHash.substring(0, 2)}/${skinData.skinHash}`;
-        const response = await fetch(urlS3);
+        if (process.env.STORAGE === 's3'){
+            const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/skin/${skinData.skinHash.substring(0, 2)}/${skinData.skinHash}`;
+            const response = await fetch(urlS3);
+            res.set('Content-Type', 'image/png');
+            return res.send(Buffer.from(await response.arrayBuffer()));
+        }
+
+        const url = `${process.env.URL_BACKEND_EASY_CABINET}/skin/${skinData.skinHash.substring(0, 2)}/${skinData.skinHash}`
+        const response = await fetch(url);
         res.set('Content-Type', 'image/png');
         res.send(Buffer.from(await response.arrayBuffer()));
     } catch (error) {
@@ -51,8 +59,16 @@ app.get('/cape/:userName', async (req, res) => {
             return res.status(404).json({ error: 'Cape not found' });
         };
 
-        const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/cape/${capeData.capeHash.substring(0, 2)}/${capeData.capeHash}`;
-        const response = await fetch(urlS3);
+
+        if (process.env.STORAGE === 's3'){
+            const urlS3 = `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/cape/${capeData.capeHash.substring(0, 2)}/${capeData.capeHash}`;
+            const response = await fetch(urlS3);
+            res.set('Content-Type', 'image/png');
+            return res.send(Buffer.from(await response.arrayBuffer()));
+        }
+
+        const url = `${process.env.URL_BACKEND_EASY_CABINET}/cape/${capeData.capeHash.substring(0, 2)}/${capeData.capeHash}`
+        const response = await fetch(url);
         res.set('Content-Type', 'image/png');
         res.send(Buffer.from(await response.arrayBuffer()));
     } catch (error) {
@@ -61,6 +77,6 @@ app.get('/cape/:userName', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+app.listen(port, hostname, () => {
+    console.log(`Textures proxy app listening on http://${hostname}:${port}`);
 });

@@ -10,10 +10,13 @@ API rest для упрощённого построения путей до ск
     ```
 2. Отредактируйте ``.env``
     ```
-    PORT=3000 # Порт API приложения
-    DATABASE_URL="mysql://root:password@localhost:3306/db" # Адрес базы данных
+    HOSTNAME="127.0.0.1" # Адрес который слушает API REST приложение
+    PORT=3000 # Порт который слушает API REST приложение
+    DATABASE_URL="mysql://root:password@localhost:3306/db"
+    STORAGE="backend" # Выбор хранения текстур может быть backend или s3
+    URL_BACKEND_EASY_CABINET="http://localhost:4000/" # Адрес backend EasyCabinet
+    S3_PUBLIC_URL="http://localhost:9000" # Адрес S3 хранилища
     S3_BUCKET="easy-cabinet" # Имя хранилища
-    S3_PUBLIC_URL="http://0.0.0.0:9000" # Адрес S3 хранилища
     ```
 3. Сгенерируйте prisma схему
     ```
