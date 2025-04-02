@@ -1,6 +1,6 @@
 {
   "name": "api-easycabinet",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "REST API for simplified construction of paths to skins and capes AuroraTeam/EasyCabinet",
   "license": "MIT",
   "author": "StelStelox",
