@@ -15,9 +15,8 @@ async function getHash(userName) {
 function getUrl(hash, type) {
     if (process.env.STORAGE === 's3') {
         return `${process.env.S3_PUBLIC_URL}/${process.env.S3_BUCKET}/${type}/${hash.substring(0, 2)}/${hash}`;
-    } else {
-        return `${process.env.URL_BACKEND_EASY_CABINET}/${type}/${hash.substring(0, 2)}/${hash}`;
     };
+    return `${process.env.URL_BACKEND_EASY_CABINET}/uploads/${type}/${hash.substring(0, 2)}/${hash}`;
 };
 
 app.get('/:type/:userName', async (req, res) => {
