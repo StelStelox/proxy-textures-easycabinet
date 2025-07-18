@@ -40,12 +40,12 @@ async fn get_skin(Path(username): Path<String>) -> Result<impl IntoResponse, (St
     ))?;
 
     let config = get_config();
-    let url = format!(
-        "{}/uploads/skin/{}/{}",
-        config.backend_url,
-        &hash[0..2],
-        hash
-    );
+    let url = match config.storage.as_str() {
+        "backend" =>  format!("{}/uploads/skin/{}/{}", config.backend_url, &hash[0..2], hash),
+        "s3" => format!("{}/{}/skin/{}/{}", config.s3_url, config.s3_bucket, &hash[0..2], hash),
+        _ => panic!("Error type storage")
+        
+    };
 
     let response = Client::builder()
         .build()
@@ -79,12 +79,12 @@ async fn get_cape(Path(username): Path<String>) -> Result<impl IntoResponse, (St
         format!("Skin for user {} not found", username),
     ))?;
     let config = get_config();
-    let url = format!(
-        "{}/uploads/cape/{}/{}",
-        config.backend_url,
-        &hash[0..2],
-        hash
-    );
+    let url = match config.storage.as_str() {
+        "backend" =>  format!("{}/uploads/cape/{}/{}", config.backend_url, &hash[0..2], hash),
+        "s3" => format!("{}/{}/cape/{}/{}", config.s3_url, config.s3_bucket, &hash[0..2], hash),
+        _ => panic!("Error type storage")
+        
+    };
 
     let response = Client::builder()
         .build()
