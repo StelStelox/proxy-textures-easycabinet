@@ -1,13 +1,15 @@
 use crate::config::get_config;
 use axum::{
-    Router,
-    extract::Path,
+    Json, Router,
+    extract::{Path, rejection::JsonRejection},
     http::{HeaderMap, HeaderValue, StatusCode},
     response::IntoResponse,
     routing::get,
 };
 use reqwest::Client;
+use serde_json::{Value, json};
 use sqlx::prelude::FromRow;
+use tokio::io::Join;
 mod config;
 
 #[tokio::main]
@@ -24,27 +26,35 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn get_skin(Path(username): Path<String>) -> Result<impl IntoResponse, (StatusCode, String)> {
+async fn get_skin(
+    Path(username): Path<String>,
+) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
     let data = get_hash(&username).await.unwrap();
     if data.is_none() {
-        return Err((
-            StatusCode::NOT_FOUND,
-            format!("User {} not found", username),
-        ));
+        return Err((StatusCode::NOT_FOUND, Json(json!(""))));
     }
 
     let user = data.unwrap();
-    let hash = user.skin_hash.ok_or((
-        StatusCode::NOT_FOUND,
-        format!("Skin for user {} not found", username),
-    ))?;
+    let hash = user
+        .skin_hash
+        .ok_or((StatusCode::NOT_FOUND, Json(json!(""))))?;
 
     let config = get_config();
     let url = match config.storage.as_str() {
-        "backend" =>  format!("{}/uploads/skin/{}/{}", config.backend_url, &hash[0..2], hash),
-        "s3" => format!("{}/{}/skin/{}/{}", config.s3_url, config.s3_bucket, &hash[0..2], hash),
-        _ => panic!("Error type storage")
-        
+        "backend" => format!(
+            "{}/uploads/skin/{}/{}",
+            config.backend_url,
+            &hash[0..2],
+            hash
+        ),
+        "s3" => format!(
+            "{}/{}/skin/{}/{}",
+            config.s3_url,
+            config.s3_bucket,
+            &hash[0..2],
+            hash
+        ),
+        _ => panic!("Error type storage"),
     };
 
     let response = Client::builder()
@@ -53,10 +63,10 @@ async fn get_skin(Path(username): Path<String>) -> Result<impl IntoResponse, (St
         .get(url)
         .send()
         .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({}))))?
         .bytes()
         .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({}))))?;
 
     let mut header = HeaderMap::new();
     header.insert("Content-Type", HeaderValue::from_static("image/png"));
@@ -64,26 +74,35 @@ async fn get_skin(Path(username): Path<String>) -> Result<impl IntoResponse, (St
     Ok((StatusCode::OK, header, response))
 }
 
-async fn get_cape(Path(username): Path<String>) -> Result<impl IntoResponse, (StatusCode, String)> {
+async fn get_cape(
+    Path(username): Path<String>,
+) -> Result<impl IntoResponse, (StatusCode, Json<Value>)> {
     let data = get_hash(&username).await.unwrap();
     if data.is_none() {
-        return Err((
-            StatusCode::NOT_FOUND,
-            format!("User {} not found", username),
-        ));
+        return Err((StatusCode::NOT_FOUND, Json(json!(""))));
     }
 
     let user = data.unwrap();
-    let hash = user.cape_hash.ok_or((
-        StatusCode::NOT_FOUND,
-        format!("Skin for user {} not found", username),
-    ))?;
+    let hash = user
+        .skin_hash
+        .ok_or((StatusCode::NOT_FOUND, Json(json!(""))))?;
+
     let config = get_config();
     let url = match config.storage.as_str() {
-        "backend" =>  format!("{}/uploads/cape/{}/{}", config.backend_url, &hash[0..2], hash),
-        "s3" => format!("{}/{}/cape/{}/{}", config.s3_url, config.s3_bucket, &hash[0..2], hash),
-        _ => panic!("Error type storage")
-        
+        "backend" => format!(
+            "{}/uploads/cape/{}/{}",
+            config.backend_url,
+            &hash[0..2],
+            hash
+        ),
+        "s3" => format!(
+            "{}/{}/cape/{}/{}",
+            config.s3_url,
+            config.s3_bucket,
+            &hash[0..2],
+            hash
+        ),
+        _ => panic!("Error type storage"),
     };
 
     let response = Client::builder()
@@ -92,10 +111,10 @@ async fn get_cape(Path(username): Path<String>) -> Result<impl IntoResponse, (St
         .get(url)
         .send()
         .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({}))))?
         .bytes()
         .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({}))))?;
 
     let mut header = HeaderMap::new();
     header.insert("Content-Type", HeaderValue::from_static("image/png"));
